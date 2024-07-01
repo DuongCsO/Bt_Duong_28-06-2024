@@ -45,7 +45,7 @@ class ContactImportWiz(models.TransientModel):
                         'product_id': int(import_line.get('product_id')),
                         'date': iso_date,
                         'description': import_line.get('description'),
-                        'qty': import_line.get('qty'),
+                        'qty': float(import_line.get('qty')),
                     })
 
         
