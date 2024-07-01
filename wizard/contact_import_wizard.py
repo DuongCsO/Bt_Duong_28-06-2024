@@ -1,8 +1,7 @@
 import xlrd
 import tempfile
 import binascii
-
-
+import datetime
 from odoo import fields, models, SUPERUSER_ID
 from odoo.exceptions import UserError
 
@@ -37,10 +36,14 @@ class ContactImportWiz(models.TransientModel):
             import_lines.append(line)
         print(import_lines)
         for import_line in import_lines:
+            base_date = datetime.date(1900, 1, 1)
+            delta_days = datetime.timedelta(days=import_line.get('date') - 2)
+            target_date = base_date + delta_days
+            iso_date = target_date.isoformat()
             custom_request = self.env['crm.customer.request'].with_user(SUPERUSER_ID).sudo().create({
-                        'opportunity_id': import_line.get('opportunity_id'),
-                        'product_id': import_line.get('product_id'),
-                        'date': import_line.get('date'),
+                        'opportunity_id': int(import_line.get('opportunity_id')),
+                        'product_id': int(import_line.get('product_id')),
+                        'date': iso_date,
                         'description': import_line.get('description'),
                         'qty': import_line.get('qty'),
                     })
