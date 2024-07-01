@@ -1,47 +1,69 @@
 
+
 from odoo import http
+from odoo import SUPERUSER_ID
+from odoo.exceptions import AccessError, MissingError, ValidationError
 
 
 class BtDuong(http.Controller):
-    @http.route('/create_lead', methods=['POST'], type='json', auth='none')
-    def create_lead(self, **kwargs):
-        lead = http.request.env['crm.lead'].sudo().create({
-            'name': kwargs.get('name'),
-            'type': kwargs.get('type'),
-            'partner_id': kwargs.get('partner_id'),
-            'date_deadline': kwargs.get('date_deadline'),
-            'email_cc': kwargs.get('email_cc'),
-            'phone': kwargs.get('phone'),
-            'description': kwargs.get('description'),
-        })
-        custom_requests_data = kwargs.get('custom_requests', [])
-        custom_requests = []
-        
-        for req_data in custom_requests_data:
-            product_id = req_data.get('product_id')
-            date = req_data.get('date')
-            description = req_data.get('description')
-            qty = req_data.get('qty')
-            custom_request = http.request.env['crm.customer.request'].sudo().create({
-                'product_id': product_id,
-                'date': date,
-                'description': description,
-                'qty': qty,
+    @http.route('/create_lead', type='json', auth='none')
+    def create_lead(self):
+        """
+        Demo api call:
+        {
+            "name":"name 1",
+            "type": "opportunity",
+            "partner_id": 3,
+            "date_deadline": "2024-07-01",
+            "email_cc": "test@example.com",
+            "phone": "123456789",
+            "description": "Test lead creation",
+            "custom_requests": [
+                {
+                "product_id": 1,
+                "date": "2024-07-01",
+                "description": "Request description 1",
+                "qty": 10
+                },
+                {
+                "product_id": 1,
+                "date": "2024-07-02",
+                "description": "Request description 2",
+                "qty": 5
+                }
+            ]
+        }
+        """
+        try:
+            vals = http.request.get_json_data()
+            lead = http.request.env['crm.lead'].with_user(SUPERUSER_ID).sudo().create({
+                'name': vals.get('name'),
+                'type': vals.get('type'),
+                'partner_id': vals.get('partner_id'),
+                'date_deadline': vals.get('date_deadline'),
+                'email_cc': vals.get('email_cc'),
+                'phone': vals.get('phone'),
+                'description': vals.get('description'),
             })
 
-#     @http.route('/bt_duong/bt_duong', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+            if 'custom_requests' in vals and isinstance(vals.get('custom_requests'), list):
+                custom_requests = vals.get('custom_requests')
+                for value in custom_requests:
+                    product_id = value.get('product_id')
+                    date = value.get('date')
+                    description = value.get('description')
+                    qty = value.get('qty')
+                    custom_request = http.request.env['crm.customer.request'].with_user(SUPERUSER_ID).sudo().create({
+                        'opportunity_id': lead.id,
+                        'product_id': product_id,
+                        'date': date,
+                        'description': description,
+                        'qty': qty,
+                    })
+            return {
+                'message':'Add record successfully',
+                'id': lead.id
+            }
+        except(AccessError, MissingError):
+            return
 
-#     @http.route('/bt_duong/bt_duong/objects', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('bt_duong.listing', {
-#             'root': '/bt_duong/bt_duong',
-#             'objects': http.request.env['bt_duong.bt_duong'].search([]),
-#         })
-
-#     @http.route('/bt_duong/bt_duong/objects/<model("bt_duong.bt_duong"):obj>', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('bt_duong.object', {
-#             'object': obj
-#         })

@@ -23,3 +23,13 @@ class CrmLead(models.Model):
     def _compute_revenue(self):
         for lead in self:
             lead.expected_revenue = sum(request.qty*(request.product_id.standard_price-request.product_id.list_price) for request in lead.request_ids)
+
+    def contact_import_wiz_action(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'contact.import.wiz',
+            'view_mode':'form',
+            'target': 'new',
+            'views': [(False, 'form')]
+            # 'views': [(env.ref('demo_import_contacts.view_contact_import_wiz_form').id, 'form')]
+        }

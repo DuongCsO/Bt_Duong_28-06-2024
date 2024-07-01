@@ -25,6 +25,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'wizard/contact_import_wizard_views.xml',
         'views/crm_customer_request_views.xml',
         'views/views.xml',
         'views/templates.xml',

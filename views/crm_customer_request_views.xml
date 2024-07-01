@@ -9,6 +9,7 @@
                 <tree string="Customer Requests">
                     <field name="product_id"></field>
                     <field name="opportunity_id"></field>
+                    <field name="description"></field>
                     <field name="date"></field>
                     <field name="qty"></field>
                 </tree>
@@ -22,7 +23,11 @@
                 <form string="Customer Request">
                     <sheet>
                         <group>
-                            
+                            <field name="product_id"></field>
+                            <field name="opportunity_id"></field>
+                            <field name="date"></field>
+                            <field name="description"></field>
+                            <field name="qty"></field>
                         </group>
                     </sheet>
                 </form>
@@ -42,7 +47,7 @@
                 action="crm_customer_request_action"
                 sequence="1"/>
 
-        <record id="crm_lead_view_form_inherited" model="ir.ui.view">
+        <record id="crm_lead_view_form_in_crm_customer_request" model="ir.ui.view">
             <field name="name">crm.lead.form.inherited</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_lead_view_form"/>
@@ -51,6 +56,9 @@
                 <data>
                     <xpath expr="//page[@name='internal_notes']" position="before">
                         <page name="customer_request" string="Request of customer">
+                            <header>
+                                <button name="contact_import_wiz_action" string="Import .xlsx" type="object"/>
+                            </header>
                             <field 
                                 name="request_ids" 
                                 attrs="{'readonly': [('stage_id', '!=', 1)]}">
@@ -75,33 +83,5 @@
             </field>
         </record>
 
-        <!-- <record id="view_order_form_view_form_inherit" model="ir.ui.view">
-            <field name="name">view_order_form.view.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="priority">1</field>
-            <field name="arch" type="xml">
-                <data>
-                    <xpath expr="//field[@name='payment_term_id']" position="after">
-                                <field 
-                                name="requests">
-                                    <tree>
-                                        <field name="product_id"></field>
-                                        <field name="qty"></field>
-                                    </tree>
-                                    <form>
-                                        <group>
-                                            <field name="product_id" options="{'no_open': True, 'no_create': True}"></field>
-                                            <field name="date"></field>
-                                            <field name="description"></field>
-                                            <field name="qty"></field>
-                                        </group>
-                                    </form>
-                                </field>
-                    </xpath>
-                </data>
-                
-            </field>
-        </record> -->
     </data>
 </odoo>

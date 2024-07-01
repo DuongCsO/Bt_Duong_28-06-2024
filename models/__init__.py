@@ -1,3 +1,1 @@
-# -*- coding: utf-8 -*-
-
-from . import crm_customer_request, crm_lead, sale_order
+from . import crm_customer_request, crm_lead, sale_order_line, sale_order
