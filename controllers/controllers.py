@@ -1,12 +1,12 @@
 
-
+import datetime
 from odoo import http
 from odoo import SUPERUSER_ID
 from odoo.exceptions import AccessError, MissingError, ValidationError
 
 
 class BtDuong(http.Controller):
-    @http.route('/create_lead', type='json', auth='none')
+    @http.route('/create_lead', methods=['POST'], type='json', auth='none')
     def create_lead(self):
         """
         Demo api call:
@@ -39,8 +39,8 @@ class BtDuong(http.Controller):
             lead = http.request.env['crm.lead'].with_user(SUPERUSER_ID).sudo().create({
                 'name': vals.get('name'),
                 'type': vals.get('type'),
-                'partner_id': vals.get('partner_id'),
-                'date_deadline': vals.get('date_deadline'),
+                'partner_id': int(vals.get('partner_id')),
+                'date_deadline': datetime.datetime.strptime(vals.get('date_deadline'), '%Y-%m-%d').date(),
                 'email_cc': vals.get('email_cc'),
                 'phone': vals.get('phone'),
                 'description': vals.get('description'),
@@ -49,10 +49,10 @@ class BtDuong(http.Controller):
             if 'custom_requests' in vals and isinstance(vals.get('custom_requests'), list):
                 custom_requests = vals.get('custom_requests')
                 for value in custom_requests:
-                    product_id = value.get('product_id')
-                    date = value.get('date')
+                    product_id = int(value.get('product_id'))
+                    date = datetime.datetime.strptime(value.get('date'), '%Y-%m-%d').date()
                     description = value.get('description')
-                    qty = value.get('qty')
+                    qty = float(value.get('qty'))
                     custom_request = http.request.env['crm.customer.request'].with_user(SUPERUSER_ID).sudo().create({
                         'opportunity_id': lead.id,
                         'product_id': product_id,
